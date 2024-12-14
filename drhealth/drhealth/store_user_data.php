@@ -8,12 +8,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['fname'] = $input['fname'];
     $_SESSION['lname'] = $input['lname'];
     $_SESSION['age'] = $input['age'];
-    $_SESSION['barangay'] = $input['barangay']; // Store Barangay
-    $_SESSION['municipality'] = $input['municipality']; // Store Municipality
+    $_SESSION['province'] = $input['province']; // Store province
     $_SESSION['city'] = $input['city']; // Store City
+    $_SESSION['barangay'] = $input['barangay']; // Store Barangay
 
     // Combine address components and store as address
-    $_SESSION['address'] = $input['barangay'] . ", " . $input['municipality'] . ", " . $input['city'];
+    $_SESSION['address'] = $input['province'] . ", " . $input['city'] . ", " . $input['barangay'];
 
     $_SESSION['gender'] = $input['gender'];
     $_SESSION['email'] = $input['email'];

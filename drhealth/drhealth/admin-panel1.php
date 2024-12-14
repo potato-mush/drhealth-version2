@@ -566,9 +566,9 @@ if (isset($_POST['change_status'])) {
           <!-- Search Input -->
           <form method="GET" class="flex space-x-4">
             <div class="flex items-center">
-              <input type="text" name="search" placeholder="Search Doctor Name or ID"
+              <input type="text" name="doctor_search" placeholder="Search Doctor Name or ID"
                 class="form-input px-4 py-2 border rounded-md"
-                value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" />
+                value="<?php echo isset($_GET['doctor_search']) ? htmlspecialchars($_GET['doctor_search']) : ''; ?>" />
             </div>
 
             <!-- Status Filter Dropdown -->
@@ -600,7 +600,7 @@ if (isset($_POST['change_status'])) {
             <tbody>
               <?php
               // Capture search and status filter
-              $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+              $search = isset($_GET['doctor_search']) ? mysqli_real_escape_string($con, $_GET['doctor_search']) : '';
               $statusFilter = isset($_GET['status']) ? mysqli_real_escape_string($con, $_GET['status']) : '';
 
               // Build the query with search and status filter conditions
@@ -680,9 +680,9 @@ if (isset($_POST['change_status'])) {
           <form method="GET" class="flex space-x-4">
             <!-- Search Input -->
             <div class="flex items-center">
-              <input type="text" name="search" placeholder="Search Patient ID, Name, or Doctor"
+              <input type="text" name="patient_search" placeholder="Search Patient ID, Name, or Doctor"
                 class="form-input px-4 py-2 border rounded-md"
-                value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" />
+                value="<?php echo isset($_GET['patient_search']) ? htmlspecialchars($_GET['patient_search']) : ''; ?>" />
             </div>
 
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">Search</button>
@@ -707,7 +707,7 @@ if (isset($_POST['change_status'])) {
             <tbody>
               <?php
               // Capture the search term
-              $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+              $search = isset($_GET['patient_search']) ? mysqli_real_escape_string($con, $_GET['patient_search']) : '';
 
               // Base query for fetching patient data
               $query = "SELECT * FROM appointmenttb WHERE doctorStatus = 2";
@@ -769,9 +769,9 @@ if (isset($_POST['change_status'])) {
           <form method="GET" class="flex space-x-4">
             <!-- Search Input -->
             <div class="flex items-center">
-              <input type="text" name="search" placeholder="Search by ID, Name, Specialization, or Email"
+              <input type="text" name="archived_doctor_search" placeholder="Search by ID, Name, Specialization, or Email"
                 class="form-input px-4 py-2 border rounded-md"
-                value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" />
+                value="<?php echo isset($_GET['archived_doctor_search']) ? htmlspecialchars($_GET['archived_doctor_search']) : ''; ?>" />
             </div>
 
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">Search</button>
@@ -792,7 +792,7 @@ if (isset($_POST['change_status'])) {
             <tbody>
               <?php
               // Capture the search term if available
-              $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
+              $search = isset($_GET['archived_doctor_search']) ? mysqli_real_escape_string($con, $_GET['archived_doctor_search']) : '';
 
               // Base query to select archived doctors
               $query = "SELECT * FROM doctb WHERE status = 'archived'";

@@ -202,8 +202,8 @@
             var lname = document.getElementById('lname').value;
             var age = document.getElementById('age').value;
 
-            var city = document.getElementById('city').value;
             var province = document.getElementById('province').value;
+            var city = document.getElementById('city').value;
             var barangay = document.getElementById('barangay').value;
 
             var gender = document.querySelector('input[name="gender"]:checked').value;
@@ -226,9 +226,9 @@
                     fname: fname,
                     lname: lname,
                     age: age,
-                    barangay: barangay,
                     province: province,
                     city: city,
+                    barangay: barangay,
                     gender: gender,
                     email: email,
                     password: password,
