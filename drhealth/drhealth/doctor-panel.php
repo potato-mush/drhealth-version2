@@ -188,49 +188,49 @@ if (isset($_POST['search_submit'])) {
     if (!empty($pid)) {
       // If patient ID is provided, filter by both patient ID and doctor
       $search_query = "SELECT pid, ID, fname, lname, appdate FROM prestb WHERE pid = ? AND doctor = ?";
-  } elseif ($active_div == "patients") {
+    } elseif ($active_div == "patients") {
       // For patients view, filter by doctor only
       $search_query = "SELECT a.pid, a.fname, a.lname, a.gender, a.email, a.contact, a.appdate
                        FROM appointmenttb a
                        JOIN patreg p ON a.pid = p.pid
                        WHERE a.doctor = ?";
-  } else {
+    } else {
       // Default: Filter only by doctor
       $search_query = "SELECT pid, ID, fname, lname, appdate FROM prestb WHERE doctor = ?";
-  }
-  
-  // Prepare the query
-  if (!empty($search_query)) {
+    }
+
+    // Prepare the query
+    if (!empty($search_query)) {
       if ($stmt = $con->prepare($search_query)) {
-          // Bind parameters dynamically
-          if (!empty($pid) && $search_query === "SELECT pid, ID, fname, lname, appdate FROM prestb WHERE pid = ? AND doctor = ?") {
-              $stmt->bind_param('ss', $pid, $doctor); // Two string parameters: patient ID and doctor
-          } else {
-              $stmt->bind_param('s', $doctor); // One string parameter: doctor
-          }
-  
-          // Execute the query
-          $stmt->execute();
-  
-          // Fetch the result
-          $result = $stmt->get_result();
-          $search_results = [];
-  
-          // Store the results in an array
-          while ($row = $result->fetch_assoc()) {
-              $search_results[] = $row;
-          }
-  
-          // Close the statement
-          $stmt->close();
+        // Bind parameters dynamically
+        if (!empty($pid) && $search_query === "SELECT pid, ID, fname, lname, appdate FROM prestb WHERE pid = ? AND doctor = ?") {
+          $stmt->bind_param('ss', $pid, $doctor); // Two string parameters: patient ID and doctor
+        } else {
+          $stmt->bind_param('s', $doctor); // One string parameter: doctor
+        }
+
+        // Execute the query
+        $stmt->execute();
+
+        // Fetch the result
+        $result = $stmt->get_result();
+        $search_results = [];
+
+        // Store the results in an array
+        while ($row = $result->fetch_assoc()) {
+          $search_results[] = $row;
+        }
+
+        // Close the statement
+        $stmt->close();
       } else {
-          echo "Error: Unable to prepare the query.";
+        echo "Error: Unable to prepare the query.";
       }
-  } else {
+    } else {
       echo "Error: Search query not defined.";
+    }
   }
-  }
-}  
+}
 // Assuming the connection to the database is already established
 function get_doctor_info($con)
 {
@@ -736,15 +736,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_submit'])) {
             if (mysqli_num_rows($appointments_results) > 0) {
               while ($row = mysqli_fetch_array($appointments_results)) {
                 echo "<tr class='border-b'>
-                <td class='py-2 px-4'>{$row['queue_number']}</td>
-                <td class='py-2 px-4'>{$row['reference_number']}</td>
-                <td class='py-2 px-4'>{$row['pid']}</td>
-                <td class='py-2 px-4'>{$row['fname']}</td>
-                <td class='py-2 px-4'>{$row['lname']}</td>
-                <td class='py-2 px-4'>{$row['appdate']}</td>
-                <td class='py-2 px-4'>" . date("g:i A", strtotime($row['apptime'])) . "</td>
-                <td class='py-2 px-4'>";
+            <td class='py-2 px-4'>{$row['queue_number']}</td>
+            <td class='py-2 px-4'>{$row['reference_number']}</td>
+            <td class='py-2 px-4'>{$row['pid']}</td>
+            <td class='py-2 px-4'>{$row['fname']}</td>
+            <td class='py-2 px-4'>{$row['lname']}</td>
+            <td class='py-2 px-4'>{$row['appdate']}</td>
+            <td class='py-2 px-4'>" . date("g:i A", strtotime($row['apptime'])) . "</td>
+            <td class='py-2 px-4'>";
 
+                // Current Status
                 if (($row['userStatus'] == 1) && ($row['doctorStatus'] == 1)) {
                   echo "<strong>Pending</strong>";
                 } elseif (($row['userStatus'] == 0) || ($row['doctorStatus'] == 0)) {
@@ -755,10 +756,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_submit'])) {
 
                 echo "</td>";
 
-                // Add action and prescribe columns
-                echo "<td class='py-2 px-4'>Action Logic Here</td>
-                  <td class='py-2 px-4'>Prescribe Logic Here</td>
-              </tr>";
+                // Action Logic
+                echo "<td class='py-2 px-4'>";
+                if (($row['userStatus'] == 1) && ($row['doctorStatus'] == 1)) { // Appointment pending
+                  $query_prescription = "SELECT * FROM prestb WHERE ID = '" . $row['ID'] . "'";
+                  $result_prescription = mysqli_query($con, $query_prescription);
+                  if (mysqli_num_rows($result_prescription) == 0) {
+            ?>
+                    <div class="inline-flex space-x-2">
+                      <a href="doctor-panel.php?ID=<?php echo $row['ID']; ?>&cancel=update"
+                        onClick="return confirm('Are you sure you want to cancel this appointment?')"
+                        class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700">
+                        <i class="fas fa-times"></i> <!-- Cancel Icon -->
+                      </a>
+
+                      <a href="doctor-panel.php?ID=<?php echo $row['ID']; ?>&confirm=update"
+                        onClick="return confirm('Are you sure you want to confirm this appointment?')"
+                        class="bg-green-600 text-white p-2 rounded-full hover:bg-green-700">
+                        <i class="fas fa-check"></i> <!-- Confirm Icon -->
+                      </a>
+                    </div>
+            <?php
+                  } else {
+                    echo "-";
+                  }
+                } elseif ($row['doctorStatus'] == 2) {
+                  echo "-";
+                } else {
+                  echo "Cancelled";
+                }
+                echo "</td>"; // Close action column
+
+                // Prescribe Logic Column
+                echo "<td class='py-2 px-4'>";
+                if (($row['userStatus'] == 1) && ($row['doctorStatus'] == 1)) { // Appointment pending
+                  $query_prescription = "SELECT * FROM prestb WHERE ID = '" . $row['ID'] . "'";
+                  $result_prescription = mysqli_query($con, $query_prescription);
+                  if (mysqli_num_rows($result_prescription) == 0) {
+                    echo '<button class="bg-green-600 text-white px-4 py-2 rounded opacity-50 cursor-not-allowed" disabled>Prescribe</button>';
+                  } else {
+                    echo "<strong>PRESCRIBED</strong>";
+                  }
+                } elseif ($row['doctorStatus'] == 2) { // Appointment confirmed
+                  $query_prescription = "SELECT * FROM prestb WHERE ID = '" . $row['ID'] . "'";
+                  $result_prescription = mysqli_query($con, $query_prescription);
+                  if (mysqli_num_rows($result_prescription) == 0) {
+                    echo '<a href="prescribe.php?pid=' . $row['pid'] . '&ID=' . $row['ID'] . '&fname=' . $row['fname'] . '&lname=' . $row['lname'] . '&appdate=' . $row['appdate'] . '&apptime=' . $row['apptime'] . '" class="bg-green-600 text-white px-4 py-2 rounded">Prescribe</a>';
+                  } else {
+                    echo "<strong>PRESCRIBED</strong>";
+                  }
+                } else {
+                  echo "-";
+                }
+                echo "</td>"; // Close prescribe column
+
+                // Closing table row
+                echo "</tr>";
               }
             } else {
               echo "<tr><td colspan='10' class='text-center py-4'>No records found</td></tr>";
@@ -767,6 +820,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_submit'])) {
           </tbody>
         </table>
       </div>
+
       <div id="prescriptions" class="<?php echo $active_div == 'prescriptions' ? '' : 'hidden'; ?> mt-8">
         <form class="flex mb-4" method="post" action="">
           <input type="hidden" name="active_div" value="prescriptions">
