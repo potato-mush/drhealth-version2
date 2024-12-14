@@ -25,6 +25,9 @@ if (isset($_POST['docsub'])) {
   $password = $_POST['dpassword'];
   $specialization = $_POST['special'];
 
+  // Add +639 prefix to contact number
+  $contact_number = '+639' . $contact_number;
+
   // Combine first, middle, and last name for the username
   $username = "Dr. " . $first_name . ' ' . $middle_name . ' ' . $last_name;
 
@@ -53,6 +56,7 @@ if (isset($_POST['docsub'])) {
     echo 'Execute failed: ' . htmlspecialchars($stmt->error);
   }
 }
+
 
 if (isset($_POST['change_status'])) {
   $demail = $_POST['demail'];
