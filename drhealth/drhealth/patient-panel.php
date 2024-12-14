@@ -1220,18 +1220,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                         </div>
                         <!-- Address Fields -->
                         <div>
-                            <label for="city" class="block text-sm font-medium text-gray-700">City</label>
-                            <input type="text" name="city" id="city" class="form-input mt-1 block w-full p-2 border rounded" placeholder="City" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" value="<?= $city ?? ''; ?>" required>
-                        </div>
-                        <div>
-                            <label for="barangay" class="block text-sm font-medium text-gray-700">City/Municipality</label>
-                            <input type="text" name="barangay" id="barangay" class="form-input mt-1 block w-full p-2 border rounded" placeholder="Barangay" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" value="<?= $barangay ?? ''; ?>" required>
-                        </div>
-                        <div>
                             <label for="province" class="block text-sm font-medium text-gray-700">Province</label>
                             <input type="text" name="province" id="province" class="form-input mt-1 block w-full p-2 border rounded" placeholder="Province" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" value="<?= $province ?? ''; ?>" required>
                         </div>
-
+                        <div>
+                            <label for="city" class="block text-sm font-medium text-gray-700">City/Municipality</label>
+                            <input type="text" name="city" id="city" class="form-input mt-1 block w-full p-2 border rounded" placeholder="City" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" value="<?= $city ?? ''; ?>" required>
+                        </div>
+                        <div>
+                            <label for="barangay" class="block text-sm font-medium text-gray-700">Barangay</label>
+                            <input type="text" name="barangay" id="barangay" class="form-input mt-1 block w-full p-2 border rounded" placeholder="Barangay" pattern="[A-Za-z\s]+" title="Only letters and spaces are allowed" value="<?= $barangay ?? ''; ?>" required>
+                        </div>
                         <!-- Current Password -->
                         <div>
                             <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
