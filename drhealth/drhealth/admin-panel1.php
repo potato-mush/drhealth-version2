@@ -963,7 +963,6 @@ if (isset($_POST['change_status'])) {
 
 
 
-      <!-- Monthly Reports -->
       <section id="monthly-reports" class="section hidden">
         <h4 class="text-xl font-semibold mb-4">Monthly Reports</h4>
         <div class="bg-white p-6 rounded shadow-md">
@@ -1007,9 +1006,9 @@ if (isset($_POST['change_status'])) {
 
             // Fetch data from the database
             $query = "SELECT appointmenttb.*, patreg.fname, patreg.lname, patreg.gender, patreg.email, patreg.contact, appointmenttb.userStatus, appointmenttb.doctorStatus 
-                      FROM appointmenttb 
-                      JOIN patreg ON appointmenttb.pid = patreg.pid 
-                      WHERE MONTH(appointmenttb.appdate) = ? AND YEAR(appointmenttb.appdate) = ?";
+                FROM appointmenttb 
+                JOIN patreg ON appointmenttb.pid = patreg.pid 
+                WHERE MONTH(appointmenttb.appdate) = ? AND YEAR(appointmenttb.appdate) = ?";
 
             $stmt = $con->prepare($query);
             $stmt->bind_param("ss", $month, $year);
@@ -1026,21 +1025,22 @@ if (isset($_POST['change_status'])) {
             if ($result->num_rows > 0) {
               // Add a header for the report
               echo "<h5 class='text-lg font-semibold mt-6'>Report for " . date('F', mktime(0, 0, 0, $month, 10)) . " $year</h5>";
-              echo "<table class='table-auto w-full mt-6'>
-                        <thead>
-                          <tr>
-                            <th class='px-4 py-2'>Patient ID</th>
-                            <th class='px-4 py-2'>First Name</th>
-                            <th class='px-4 py-2'>Last Name</th>
-                            <th class='px-4 py-2'>Gender</th>
-                            <th class='px-4 py-2'>Email</th>
-                            <th class='px-4 py-2'>Contact</th>
-                            <th class='px-4 py-2'>Doctor Name</th>
-                            <th class='px-4 py-2'>Appointment Date</th>
-                            <th class='px-4 py-2'>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>";
+              echo "<div class='overflow-x-auto mt-6'> <!-- Wrapper for scrollable table -->
+                <table class='table-auto w-full'>
+                  <thead>
+                    <tr>
+                      <th class='px-4 py-2'>Patient ID</th>
+                      <th class='px-4 py-2'>First Name</th>
+                      <th class='px-4 py-2'>Last Name</th>
+                      <th class='px-4 py-2'>Gender</th>
+                      <th class='px-4 py-2'>Email</th>
+                      <th class='px-4 py-2'>Contact</th>
+                      <th class='px-4 py-2'>Doctor Name</th>
+                      <th class='px-4 py-2'>Appointment Date</th>
+                      <th class='px-4 py-2'>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>";
 
               while ($row = $result->fetch_assoc()) {
                 $status = '';
@@ -1059,25 +1059,25 @@ if (isset($_POST['change_status'])) {
                 }
 
                 echo "<tr>
-                            <td class='border px-4 py-2'>{$row['pid']}</td>
-                            <td class='border px-4 py-2'>{$row['fname']}</td>
-                            <td class='border px-4 py-2'>{$row['lname']}</td>
-                            <td class='border px-4 py-2'>{$row['gender']}</td>
-                            <td class='border px-4 py-2'>{$row['email']}</td>
-                            <td class='border px-4 py-2'>{$row['contact']}</td>
-                            <td class='border px-4 py-2'>{$row['doctor']}</td>
-                            <td class='border px-4 py-2'>{$row['appdate']}</td>
-                            <td class='border px-4 py-2'>$status</td>
-                          </tr>";
+                    <td class='border px-4 py-2'>{$row['pid']}</td>
+                    <td class='border px-4 py-2'>{$row['fname']}</td>
+                    <td class='border px-4 py-2'>{$row['lname']}</td>
+                    <td class='border px-4 py-2'>{$row['gender']}</td>
+                    <td class='border px-4 py-2'>{$row['email']}</td>
+                    <td class='border px-4 py-2'>{$row['contact']}</td>
+                    <td class='border px-4 py-2'>{$row['doctor']}</td>
+                    <td class='border px-4 py-2'>{$row['appdate']}</td>
+                    <td class='border px-4 py-2'>$status</td>
+                  </tr>";
               }
-              echo "</tbody></table>";
+              echo "</tbody></table></div>"; // Close the scrollable wrapper
             } else {
               echo "<p class='mt-6 text-red-500'>No appointments found for the selected month and year.</p>";
             }
 
             echo "<script>
-                    var statusData = " . json_encode($statusCounts) . ";
-                  </script>";
+              var statusData = " . json_encode($statusCounts) . ";
+            </script>";
           }
           ?>
 
