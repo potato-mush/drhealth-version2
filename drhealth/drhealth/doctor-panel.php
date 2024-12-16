@@ -1147,12 +1147,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_submit'])) {
 
 
   <script>
+    // Function to show the div based on the hash
     function showDiv(divId) {
+      // Hide all divs inside the flex container
       const divs = document.querySelectorAll('.flex-1 > div');
       divs.forEach(div => {
         div.classList.add('hidden');
       });
-      document.getElementById(divId).classList.remove('hidden');
+
+      // Show the targeted div
+      const targetDiv = document.getElementById(divId);
+      if (targetDiv) {
+        targetDiv.classList.remove('hidden');
+        // Update the URL hash to the divId
+        location.hash = divId;
+      } else {
+        console.warn(`Div with ID ${divId} not found.`);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1160,7 +1171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_submit'])) {
       const currentMonthEl = document.getElementById('currentMonth');
       const prevMonthBtn = document.getElementById('prevMonth');
       const nextMonthBtn = document.getElementById('nextMonth');
-
+      const initialHash = location.hash.replace('#', '') || 'dashboard'; // Default to a div if no hash
+      showDiv(initialHash);
       let currentDate = new Date();
 
       function fetchAvailability(callback) {
