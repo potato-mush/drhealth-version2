@@ -1135,14 +1135,18 @@ if (isset($_POST['change_status'])) {
   <script>
     // Function to show the section based on the hash
     function showDiv(divId) {
+      // Hide all sections
       const divs = document.querySelectorAll('.section');
       divs.forEach(div => {
         div.classList.add('hidden');
       });
 
+      // Show the selected section
       const targetDiv = document.getElementById(divId);
       if (targetDiv) {
         targetDiv.classList.remove('hidden');
+        // Update the URL hash to the divId
+        window.location.hash = divId;
       } else {
         console.warn(`Div with ID ${divId} not found.`);
       }

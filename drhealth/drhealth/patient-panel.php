@@ -592,13 +592,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
     <script>
         let availableDates = [];
 
+        // Function to show the section based on the hash
         function showDiv(divId) {
+            // Hide all sections
             const divs = document.querySelectorAll('.section');
             divs.forEach(div => {
                 div.classList.add('hidden');
             });
-            document.getElementById(divId).classList.remove('hidden');
+
+            // Show the target section
+            const targetDiv = document.getElementById(divId);
+            if (targetDiv) {
+                targetDiv.classList.remove('hidden');
+                // Update the URL hash to the divId
+                location.hash = divId;
+            } else {
+                console.warn(`Div with ID ${divId} not found.`);
+            }
         }
+
 
         function fetchAvailability(doctor, appdate, callback) {
             console.log(`Fetching availability for doctor: ${doctor} on date: ${appdate}`);
@@ -676,6 +688,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
 
         document.addEventListener('DOMContentLoaded', function() {
             // Event listener for selecting a doctor
+            const initialHash = location.hash.replace('#', '') || 'dashboard'; // Default to 'dashboard' if no hash
+            showDiv(initialHash);
             document.getElementById('select-doctor-btn').addEventListener('click', function() {
                 const selectedDoctor = document.getElementById('doctor').value;
                 const selectedDate = document.getElementById('appdate').value;
@@ -904,7 +918,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
         <main class="flex-1 overflow-y-auto p-6">
             <h3 class="text-2xl font-bold mb-4">Welcome, <?php echo htmlspecialchars($username); ?>!</h3>
 
-            <section id="dashboard" class="mb-8 section">
+            <section id="dashboard" class="mb-8 section <?php echo !isset($_GET['section']) || $_GET['section'] === 'dashboard' ? '' : 'hidden'; ?>">
                 <h4 class="text-xl font-semibold mb-4">Dashboard</h4>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <!-- Book My Appointment Card -->
@@ -981,12 +995,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
             </section>
 
             <!-- Appointment History -->
-            <section id="appointment-history" class="section hidden mt-8">
+            <section id="appointment-history" class="section <?php echo isset($_GET['section']) && $_GET['section'] === 'appointment-history' ? '' : 'hidden'; ?>">
                 <h4 class="text-xl font-semibold mb-4">Appointment History</h4>
-
                 <!-- Search and Filter -->
                 <div class="flex mb-4">
-                    <form method="GET" class="flex space-x-4" onsubmit="showDiv('appointment-history');">
+                    <form method="GET" action="patient-panel.php#appointment-history" class="flex space-x-4">
                         <!-- Search Input -->
                         <div class="flex items-center">
                             <input type="text" name="search" placeholder="Search Doctor, Appointment Date, or Status"
@@ -1005,6 +1018,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                         </div>
 
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md">Search</button>
+                        <!-- Hidden input to preserve the section ID -->
+                        <input type="hidden" name="section" value="appointment-history">
                     </form>
                 </div>
 
@@ -1031,7 +1046,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
 
                             // Add search condition
                             if ($search) {
-                                $query .= " AND (doctor LIKE '%$search%' OR appdate LIKE '%$search%' OR apptime LIKE '%$search%')";
+                                $query .= " AND (doctor = '$search' OR appdate = '$search' OR apptime = '$search')";
                             }
 
                             // Add status filter condition
@@ -1071,18 +1086,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                                 }
 
                                 echo "<tr>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['doctor']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['appdate']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['apptime']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>$status</td>
-            <td class='px-4 py-2 whitespace-nowrap'>$actionButton</td>
-          </tr>";
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['doctor']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['appdate']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['apptime']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>$status</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>$actionButton</td>
+                    </tr>";
+                            }
+
+                            // Display message if no results found
+                            if (mysqli_num_rows($result) == 0) {
+                                echo "<tr>
+                        <td colspan='5' class='text-center px-4 py-4 text-gray-500'>No appointment history found.</td>
+                    </tr>";
                             }
                             ?>
                         </tbody>
                     </table>
                 </div>
             </section>
+
 
 
             <!-- Modal Structure -->
@@ -1108,13 +1131,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                 </div>
             </div>
 
-            <!-- Prescriptions -->
-            <section id="prescriptions" class="section hidden mt-8">
+            <!-- Prescriptions Section -->
+            <section id="prescriptions" class="section <?php echo isset($_GET['section']) && $_GET['section'] === 'prescriptions' ? '' : 'hidden'; ?>">
                 <h4 class="text-xl font-semibold mb-4">Prescriptions</h4>
-
                 <!-- Search Bar -->
                 <div class="flex mb-4">
-                    <form method="GET" class="flex space-x-4">
+                    <form method="GET" action="patient-panel.php#prescriptions" class="flex space-x-4">
                         <!-- Search Input -->
                         <div class="flex items-center">
                             <input type="text" name="search_prescription"
@@ -1144,12 +1166,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                         <tbody class="divide-y divide-gray-200">
                             <?php
                             // Capture the search term
-                            $search = isset($_GET['search_prescription']) ? mysqli_real_escape_string($con, $_GET['search_prescription']) : '';
+                            $searchPrescription = isset($_GET['search_prescription']) ? mysqli_real_escape_string($con, $_GET['search_prescription']) : '';
 
                             // Modify query to include search functionality
                             $query = "SELECT * FROM prestb WHERE pid='$pid'";
-                            if ($search) {
-                                $query .= " AND (pid LIKE '%$search%' OR appdate LIKE '%$search%' OR disease LIKE '%$search%' OR allergy LIKE '%$search%' OR prescription LIKE '%$search%')";
+                            if ($searchPrescription) {
+                                $query .= " AND (pid = '$searchPrescription' OR appdate = '$searchPrescription' OR disease = '$searchPrescription' OR allergy = '$searchPrescription' OR prescription = '$searchPrescription')";
                             }
 
                             // Execute the query
@@ -1158,25 +1180,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_info'])) {
                             // Display results
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo "<tr>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['pid']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['appdate']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['disease']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['allergy']) . "</td>
-            <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['prescription']) . "</td>
-          </tr>";
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['pid']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['appdate']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['disease']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['allergy']) . "</td>
+                        <td class='px-4 py-2 whitespace-nowrap'>" . htmlspecialchars($row['prescription']) . "</td>
+                    </tr>";
                             }
 
                             // Display a message if no records found
                             if (mysqli_num_rows($result) == 0) {
                                 echo "<tr>
-            <td colspan='5' class='text-center px-4 py-4 text-gray-500'>No prescriptions found.</td>
-          </tr>";
+                        <td colspan='5' class='text-center px-4 py-4 text-gray-500'>No prescriptions found.</td>
+                    </tr>";
                             }
                             ?>
                         </tbody>
                     </table>
                 </div>
             </section>
+
             <?php
             if (isset($_SESSION['alert_message'])) {
                 // Output the alert message in JavaScript
